@@ -60,8 +60,9 @@ const page = () => {
       setIsLoading(true);
       setIsSwitchLoading(false);
       try {
-        const response = await axios.get("/api/get-messags");
-        setMessages(response.data.message);
+        const response = await axios.post("/api/get-messags");
+        setMessages(response.data.messages);
+        console.log(response);
 
         if (refresh) {
           toast({
