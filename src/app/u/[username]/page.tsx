@@ -18,13 +18,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-
 import * as z from "zod";
 import { ApiResponse } from "@/types/ApiResponse";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { messageSchema } from "@/schemas/messageSchema";
-import { toast, useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const specialChar = "||";
 
@@ -39,7 +38,6 @@ export default function SendMessage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
   const { toast } = useToast();
-
   const {
     complete,
     completion,

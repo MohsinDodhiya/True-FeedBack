@@ -26,9 +26,11 @@ export async function POST(request: Request) {
     const user = await UserModel.aggregate([
       { $match: { _id: userId } },
       { $unwind: "$messages" },
-      { $sort: { "$messages.createdAt": -1 } },
+      { $sort: { "messages.createdAt": -1 } }, // Removed quotes around field name
       { $group: { _id: "$_id", messages: { $push: "$messages" } } },
     ]);
+    console.log(user);
+
     if (!user || user.length === 0) {
       return Response.json(
         {
