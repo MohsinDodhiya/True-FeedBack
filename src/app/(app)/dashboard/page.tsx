@@ -41,7 +41,7 @@ const DashboardClient = () => {
       toast({
         title: "Error",
         description:
-          axiosError.response?.data.message ||
+          axiosError.response?.data.message ??
           "Failed to fetch message settings",
         variant: "destructive",
       });
@@ -54,12 +54,27 @@ const DashboardClient = () => {
     async (refresh: boolean = false) => {
       setIsLoading(true);
       try {
-        const response = await axios.post("/api/get-messages");
-        setMessages(response.data.messages);
-        if (refresh) {
+        const response = await axios.get("/api/get-messages");
+
+        // Check if the response data has the expected structure
+        if (
+          response.data &&
+          response.data.message &&
+          Array.isArray(response.data.message)
+        ) {
+          setMessages(response.data.message);
+          if (refresh) {
+            toast({
+              title: "Refreshed Messages",
+              description: "Showing Latest Messages",
+            });
+          }
+        } else {
+          console.error("Unexpected API response structure:", response.data);
           toast({
-            title: "Refreshed Messages",
-            description: "Showing Latest Messages",
+            title: "Error",
+            description: "Received unexpected data format from the server",
+            variant: "destructive",
           });
         }
       } catch (error) {
@@ -144,7 +159,7 @@ const DashboardClient = () => {
       <div className="mb-4">
         <Switch
           {...register("acceptMessages")}
-          checked={acceptMessages}
+          checked={!!acceptMessages}
           onCheckedChange={handleSwitchChange}
           disabled={isSwitchLoading}
         />

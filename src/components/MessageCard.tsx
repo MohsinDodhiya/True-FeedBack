@@ -30,6 +30,7 @@ type MessageCardProps = {
 const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleDeleteConfirm = async () => {
     if (!message._id) {
@@ -44,30 +45,29 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
     setIsDeleting(true);
     try {
       const response = await axios.delete<ApiResponse>(
-        `/api/delete-message/${message._id}`
+        `/api/delete-message/${message._id.toString()}`
       );
-      toast({
-        title: response.data.message,
-        variant: "default",
-      });
-      onMessageDelete(message._id as string);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
+
+      if (response.data.success) {
+        onMessageDelete(message._id.toString());
         toast({
-          title: "Error",
-          description:
-            error.response.data.message || "Failed to delete message",
-          variant: "destructive",
+          title: "Success",
+          description: "Message deleted successfully",
         });
       } else {
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred",
-          variant: "destructive",
-        });
+        throw new Error(response.data.message);
       }
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error ? error.message : "Failed to delete message",
+        variant: "destructive",
+      });
     } finally {
       setIsDeleting(false);
+      setIsDialogOpen(false);
     }
   };
 
@@ -76,7 +76,7 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>{message.content}</CardTitle>
-          <AlertDialog>
+          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={isDeleting}>
                 <X className="w-5 h-5" />
