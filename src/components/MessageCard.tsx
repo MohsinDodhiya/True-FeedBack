@@ -4,7 +4,6 @@ import { useState } from "react";
 import axios from "axios";
 import dayjs from "dayjs";
 import { X } from "lucide-react";
-
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   AlertDialog,
@@ -52,7 +51,7 @@ const MessageCard = ({ message, onMessageDelete }: MessageCardProps) => {
         onMessageDelete(message._id.toString());
         toast({
           title: "Success",
-          description: "Message deleted successfully",
+          description: response.data.message,
         });
       } else {
         throw new Error(response.data.message);
